@@ -1,0 +1,26 @@
+{
+  "extends": "../tsconfig.json",
+  "exclude": [],
+  "include": [
+    "**/*.js",
+    "**/*.jsx",
+    "**/*.mjs",
+    "**/*.cjs",
+    "**/*.ts",
+    "**/*.tsx",
+    "../src/**/*.ts",
+    "../src/**/*.tsx",
+    "next.config.mjs",
+    ".next/types/**/*.ts"
+  ],
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "@payload-config": ["./payload.config.ts"],
+      "payload-media-gallery": ["../src/index.ts"],
+      "payload-media-gallery/client": ["../src/exports/client.ts"]
+    },
+    "noEmit": true,
+    "emitDeclarationOnly": false
+  }
+}
