@@ -8,7 +8,6 @@ on:
 
 permissions:
   contents: read
-  id-token: write
 
 jobs:
   publish:
@@ -30,6 +29,16 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
       - run: pnpm test
-      - run: pnpm publish --tag next --access public --no-git-checks --provenance
+      - run: pnpm build
+      - run: pnpm pack --pack-destination release
+
+      - name: Validate packed prerelease
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          TAG: ${{ github.ref_name }}
+        run: node scripts/publish.mjs --dry-run --expect-version "${TAG#v}" "release/payload-media-gallery-${TAG#v}.tgz"
+
+      - name: Publish packed prerelease to next
+        env:
+          TAG: ${{ github.ref_name }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: node scripts/publish.mjs --expect-version "${TAG#v}" "release/payload-media-gallery-${TAG#v}.tgz"

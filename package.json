@@ -1,6 +1,6 @@
 {
   "name": "payload-media-gallery",
-  "version": "0.2.0-next.0",
+  "version": "0.2.0-next.1",
   "description": "A Payload CMS 4 beta plugin that replaces the default upload-collection list with a visual grid gallery, lightbox, drag-and-drop bulk upload, and metadata sidebar.",
   "license": "MIT",
   "author": "jon8800",

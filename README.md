@@ -89,7 +89,7 @@ The plugin replaces the configured collection's list view. It keeps file metadat
 
 ## Prerelease distribution
 
-Version `0.2.0-next.0` targets Payload `4.0.0-beta.3`. Publish only to the npm `next` dist-tag. The tag workflow checks that the Git tag matches the package version.
+Version `0.2.0-next.1` targets Payload `4.0.0-beta.3`. Publish only to the npm `next` dist-tag. The tag workflow checks that the Git tag matches the package version. It builds and packs with pnpm, then publishes the packed manifest through the audited raw registry publisher. The publisher selects `next` for prereleases. It reads the GitHub Actions `NPM_TOKEN` secret only during the publish step.
 
 ## Local development
 
