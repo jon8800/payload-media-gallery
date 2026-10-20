@@ -19,7 +19,7 @@ export interface MediaDoc {
   height?: number
   createdAt?: string
   updatedAt?: string
-  sizes?: Record<string, SizeEntry | undefined>
+  variants?: Record<string, SizeEntry | undefined>
 }
 
 export function isImage(mimeType?: string | null): boolean {

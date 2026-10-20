@@ -3,11 +3,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import {
-  BulkUploadDrawer,
+  BulkUploadModal,
   BulkUploadProvider,
   toast,
   useBulkUpload,
-  useBulkUploadDrawerSlug,
+  useBulkUploadModalSlug,
   useListDrawerContext,
   useListQuery,
   useModal,
@@ -27,7 +27,7 @@ function MediaGalleryInner({ collectionSlug }: ListViewClientProps) {
   const { selected, setSelection } = useSelection()
   const { isInDrawer, onSelect } = useListDrawerContext()
   const { setCollectionSlug, setInitialFiles, setOnSuccess } = useBulkUpload()
-  const bulkUploadDrawerSlug = useBulkUploadDrawerSlug()
+  const bulkUploadModalSlug = useBulkUploadModalSlug()
 
   const docs = (data?.docs ?? []) as MediaDoc[]
 
@@ -52,8 +52,8 @@ function MediaGalleryInner({ collectionSlug }: ListViewClientProps) {
     if (files && files.length > 0) {
       setInitialFiles(files)
     }
-    openModal(bulkUploadDrawerSlug)
-  }, [openModal, bulkUploadDrawerSlug, setInitialFiles])
+    openModal(bulkUploadModalSlug)
+  }, [openModal, bulkUploadModalSlug, setInitialFiles])
 
   // Stable handler refs so memoized cards don't re-render when upstream hooks
   // (useSelection, useModal, useListDrawerContext) return fresh function refs
@@ -64,7 +64,7 @@ function MediaGalleryInner({ collectionSlug }: ListViewClientProps) {
   const handleCardClick = useCallback((index: number, doc: MediaDoc) => {
     const { isInDrawer, onSelect, collectionSlug, openModal } = handlersRef.current
     if (isInDrawer && onSelect) {
-      onSelect({ collectionSlug, doc, docID: String(doc.id) })
+      onSelect({ collectionSlug, doc })
       return
     }
     setLightboxIndex(index)
@@ -160,7 +160,7 @@ function MediaGalleryInner({ collectionSlug }: ListViewClientProps) {
         />
       )}
 
-      {!isInDrawer && <BulkUploadDrawer />}
+      {!isInDrawer && <BulkUploadModal />}
     </div>
   )
 }

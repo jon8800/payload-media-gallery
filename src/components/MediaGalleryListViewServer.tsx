@@ -21,6 +21,7 @@ const SERVER_PROP_KEYS = new Set([
   'payload',
   'permissions',
   'searchParams',
+  'server',
   'user',
 ])
 
@@ -28,6 +29,13 @@ const SERVER_PROP_KEYS = new Set([
 // keys). Unknown keys outside both sets get a dev-mode warning so we catch
 // Payload changes early rather than silently leaking.
 const KNOWN_CLIENT_PROP_KEYS = new Set([
+  'baseFilter',
+  'currentHierarchyItem',
+  'documentLayout',
+  'documentURLs',
+  'groupedData',
+  'hierarchyData',
+  'HierarchyIcon',
   'AfterList',
   'AfterListTable',
   'BeforeList',

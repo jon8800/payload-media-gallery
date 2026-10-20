@@ -11,6 +11,17 @@
     "incremental": false,
     "composite": false
   },
-  "include": ["./src/**/*.ts", "./src/**/*.tsx"],
-  "exclude": ["dev", ".next", "dist", "node_modules"]
+  "include": [
+    "./src/**/*.ts",
+    "./src/**/*.tsx"
+  ],
+  "exclude": [
+    "dev",
+    ".next",
+    "dist",
+    "node_modules",
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/fixtures/**"
+  ]
 }

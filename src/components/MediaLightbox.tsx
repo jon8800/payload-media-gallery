@@ -54,20 +54,18 @@ function MediaLightboxComponent({
   const handleDelete = useCallback(async (docId: number) => {
     setDeleting(true)
     try {
-      const res = await fetch(`${serverURL}${apiRoute}/media-gallery/delete`, {
+      const res = await fetch(`${serverURL}${apiRoute}/${encodeURIComponent(collectionSlug)}/${encodeURIComponent(docId)}`, {
         method: 'DELETE',
         credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ collection: collectionSlug, id: docId }),
       })
       const result = await res.json()
-      if (result.success) {
+      if (res.ok) {
         toast.success('File deleted')
         closeModal(LIGHTBOX_SLUG)
         setConfirmingDelete(false)
         router.refresh()
       } else {
-        toast.error(result.error || 'Delete failed')
+        toast.error(result.errors?.[0]?.message || 'Delete failed')
       }
     } catch {
       toast.error('Delete failed')
@@ -229,7 +227,7 @@ function MediaLightboxComponent({
             )}
           </dl>
 
-          {isImage(activeDoc.mimeType) && activeDoc.sizes && (
+          {isImage(activeDoc.mimeType) && activeDoc.variants && (
             <div className="media-lightbox__sizes">
               <button
                 type="button"
@@ -257,7 +255,7 @@ function MediaLightboxComponent({
                       </span>
                     </a>
                   )}
-                  {Object.entries(activeDoc.sizes).map(([name, size]) => {
+                  {Object.entries(activeDoc.variants).map(([name, size]) => {
                     if (!size?.url) return null
                     return (
                       <a key={name} href={size.url} target="_blank" rel="noopener noreferrer" className="media-lightbox__size-item">

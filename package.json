@@ -1,7 +1,7 @@
 {
   "name": "payload-media-gallery",
-  "version": "0.1.1",
-  "description": "A Payload CMS 3.x plugin that replaces the default upload-collection list with a visual grid gallery, lightbox, drag-and-drop bulk upload, and metadata sidebar.",
+  "version": "0.2.0-next.0",
+  "description": "A Payload CMS 4 beta plugin that replaces the default upload-collection list with a visual grid gallery, lightbox, drag-and-drop bulk upload, and metadata sidebar.",
   "license": "MIT",
   "author": "jon8800",
   "homepage": "https://github.com/jon8800/payload-media-gallery#readme",
@@ -60,39 +60,44 @@
     "dev:payload": "cross-env PAYLOAD_CONFIG_PATH=./dev/payload.config.ts payload",
     "generate:importmap": "pnpm dev:generate-importmap",
     "generate:types": "pnpm dev:generate-types",
-    "prepublishOnly": "pnpm clean && pnpm build"
+    "prepublishOnly": "pnpm clean && pnpm build",
+    "test:v4": "node --import tsx --test test/v4-compatibility.node.ts",
+    "test": "node --import tsx --test test/v4-compatibility.node.ts test/release-guard.node.ts",
+    "typecheck": "tsc -p tsconfig.build.json --noEmit --emitDeclarationOnly false",
+    "release:check": "node scripts/check-release.mjs"
   },
   "devDependencies": {
-    "@payloadcms/db-mongodb": "3.82.1",
-    "@payloadcms/next": "3.82.1",
-    "@payloadcms/richtext-lexical": "3.82.1",
-    "@payloadcms/ui": "3.82.1",
+    "@payloadcms/db-mongodb": "4.0.0-beta.3",
+    "@payloadcms/next": "4.0.0-beta.3",
+    "@payloadcms/richtext-lexical": "4.0.0-beta.3",
+    "@payloadcms/ui": "4.0.0-beta.3",
     "@swc/cli": "0.6.0",
-    "@types/node": "22.19.9",
-    "@types/react": "19.2.14",
-    "@types/react-dom": "19.2.3",
+    "@types/node": "24.12.3",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
     "copyfiles": "2.4.1",
     "cross-env": "^7.0.3",
     "graphql": "^16.8.1",
     "mongodb-memory-server": "10.1.4",
-    "next": "16.2.3",
-    "payload": "3.82.1",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
+    "next": "16.4.2",
+    "payload": "4.0.0-beta.3",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
     "rimraf": "3.0.2",
     "sharp": "0.34.2",
-    "typescript": "5.7.3"
+    "typescript": "6.0.3",
+    "tsx": "4.23.15"
   },
   "peerDependencies": {
-    "@payloadcms/ui": "^3.0.0",
-    "next": "^15.0.0 || ^16.0.0",
-    "payload": "^3.0.0",
+    "@payloadcms/ui": "4.0.0-beta.3",
+    "next": ">=16.4.0 <17",
+    "payload": "4.0.0-beta.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "engines": {
-    "node": "^18.20.2 || >=20.9.0",
-    "pnpm": "^9 || ^10"
+    "node": ">=24.15.0",
+    "pnpm": "^10"
   },
   "publishConfig": {
     "exports": {
@@ -113,7 +118,9 @@
       }
     },
     "main": "./dist/index.js",
-    "types": "./dist/index.d.ts"
+    "types": "./dist/index.d.ts",
+    "access": "public",
+    "tag": "next"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
@@ -124,5 +131,6 @@
       "mongodb-memory-server"
     ]
   },
-  "registry": "https://registry.npmjs.org/"
+  "registry": "https://registry.npmjs.org/",
+  "packageManager": "pnpm@10.30.3"
 }

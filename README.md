@@ -1,6 +1,6 @@
 # payload-media-gallery
 
-A [Payload CMS](https://payloadcms.com) 3.x plugin that replaces the default table view of an upload collection with a visual grid gallery.
+A [Payload CMS](https://payloadcms.com) 4 beta plugin that replaces the default table view of an upload collection with a visual grid gallery.
 
 **Features**
 
@@ -12,23 +12,24 @@ A [Payload CMS](https://payloadcms.com) 3.x plugin that replaces the default tab
 - Inline delete with confirmation
 - Bulk select via per-card checkboxes (uses Payload's built-in selection state)
 - Field picker drawer support — works as a relationship picker in other collections
-- Themed via Payload's `--theme-elevation-*` CSS variables, plus an optional `--media-gallery-accent` override
+- Themed via Payload v4 semantic CSS tokens, plus an optional `--media-gallery-accent` override
 
 ## Requirements
 
-- Payload `^3.0.0`
+- Payload and `@payloadcms/ui` `4.0.0-beta.3`
+- Node.js `>=24.15.0`
 - React `^19.0.0`, React DOM `^19.0.0`
-- Next.js `^15` or `^16`
+- Next.js `>=16.4.0 <17`
 - An upload-enabled collection
 
 ## Installation
 
 ```bash
-pnpm add payload-media-gallery
+pnpm add payload-media-gallery@next
 # or
-npm install payload-media-gallery
+npm install payload-media-gallery@next
 # or
-yarn add payload-media-gallery
+yarn add payload-media-gallery@next
 ```
 
 ## Usage
@@ -84,7 +85,11 @@ The gallery inherits Payload's neutral theme colors by default. To customize the
 
 ## How it works
 
-The plugin attaches a `beforeListTable` admin component to the configured collection and registers a small REST endpoint at `/api/media-gallery/delete` for the lightbox delete action. It does not modify your collection's schema, hooks, or access control.
+The plugin replaces the configured collection's list view. It keeps file metadata available through Payload v4's `select` function. Lightbox deletion uses Payload's standard REST DELETE route, which enforces the collection's access rules. Generated image sizes use `variants`. The plugin preserves existing access rules and endpoints.
+
+## Prerelease distribution
+
+Version `0.2.0-next.0` targets Payload `4.0.0-beta.3`. Publish only to the npm `next` dist-tag. The tag workflow checks that the Git tag matches the package version.
 
 ## Local development
 

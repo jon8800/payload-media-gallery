@@ -20,7 +20,7 @@ function MediaGalleryCardComponent({
   onClick,
   onSelectionToggle,
 }: Props) {
-  const thumbUrl = doc.sizes?.thumbnail?.url || doc.thumbnailURL || doc.url
+  const thumbUrl = doc.variants?.thumbnail?.url || doc.thumbnailURL || doc.url
   const mime = doc.mimeType
 
   return (
