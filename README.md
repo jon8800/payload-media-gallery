@@ -84,7 +84,17 @@ The gallery inherits Payload's neutral theme colors by default. To customize the
 
 ## How it works
 
-The plugin attaches a `beforeListTable` admin component to the configured collection and registers a small REST endpoint at `/api/media-gallery/delete` for the lightbox delete action. It does not modify your collection's schema, hooks, or access control.
+The plugin replaces the list view of the configured collection with the gallery. It also registers one REST endpoint, `DELETE /api/media-gallery/delete`, for the lightbox delete button. It does not change your collection's fields, hooks, or access control. It adds `custom.mediaGallery: true` to the collection, so the endpoint knows which collections it may act on.
+
+### Delete endpoint access
+
+Since 0.3.0, the delete endpoint enforces your access control:
+
+- It needs a signed-in user. Without one, it returns `401`.
+- It runs the delete with `overrideAccess: false` and the request user. Your collection's `access.delete` decides. If access is denied, it returns `403`.
+- It only deletes from collections that use the gallery. Any other collection returns `400`.
+
+Version 0.1.x did none of this. Anyone, even signed out, could delete any document in any collection. Upgrade to 0.3.0 or later.
 
 ## Local development
 
@@ -101,6 +111,15 @@ pnpm dev
 Open <http://localhost:3000/admin>. The seeded login is `dev@payloadcms.com` / `test`.
 
 The sandbox uses [`mongodb-memory-server`](https://github.com/typegoose/mongodb-memory-server) by default — no Mongo install needed. To use a real Mongo instance, set `DATABASE_URL` in `dev/.env`.
+
+The dev app turns on Next.js `cacheComponents`. In that setup the admin page hydrates under Suspense, which is where hydration bugs in the gallery show up.
+
+### Tests
+
+```bash
+pnpm test        # vitest
+pnpm typecheck
+```
 
 ### Building for publish
 
