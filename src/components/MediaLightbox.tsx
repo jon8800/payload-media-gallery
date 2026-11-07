@@ -12,6 +12,7 @@ import {
   LIGHTBOX_SLUG,
   type MediaDoc,
 } from './internal.js'
+import { useHydrated } from './useHydrated.js'
 
 interface Props {
   docs: MediaDoc[]
@@ -30,6 +31,7 @@ function MediaLightboxComponent({
   const { config } = useConfig()
   const router = useRouter()
   const { closeModal, isModalOpen } = useModal()
+  const hydrated = useHydrated()
 
   const adminRoute = config.routes?.admin ?? '/admin'
   const serverURL = config.serverURL || ''
@@ -110,6 +112,13 @@ function MediaLightboxComponent({
     window.addEventListener('keydown', handleKey)
     return () => window.removeEventListener('keydown', handleKey)
   }, [lightboxOpen, goNext, goPrev, closeModal])
+
+  // The faceless-ui Modal portals a <dialog> into Payload's modal container as
+  // soon as that container exists. The server never renders it. When the list
+  // hydrates after the container mounts (for example under Suspense with
+  // `cacheComponents`), the extra <dialog> breaks hydration. Render nothing
+  // until hydration is done, so the first client render matches the server.
+  if (!hydrated) return null
 
   if (!lightboxOpen || !activeDoc) {
     return (
