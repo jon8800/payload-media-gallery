@@ -60,7 +60,9 @@
     "dev:payload": "cross-env PAYLOAD_CONFIG_PATH=./dev/payload.config.ts payload",
     "generate:importmap": "pnpm dev:generate-importmap",
     "generate:types": "pnpm dev:generate-types",
-    "prepublishOnly": "pnpm clean && pnpm build"
+    "prepublishOnly": "pnpm clean && pnpm build",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.build.json --noEmit --emitDeclarationOnly false"
   },
   "devDependencies": {
     "@payloadcms/db-mongodb": "3.82.1",
@@ -81,7 +83,8 @@
     "react-dom": "19.2.4",
     "rimraf": "3.0.2",
     "sharp": "0.34.2",
-    "typescript": "5.7.3"
+    "typescript": "5.7.3",
+    "vitest": "^5.1.0"
   },
   "peerDependencies": {
     "@payloadcms/ui": "^3.0.0",
