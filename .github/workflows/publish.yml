@@ -8,7 +8,10 @@ on:
 
 permissions:
   contents: read
-  id-token: write
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
 
 jobs:
   publish:
@@ -20,12 +23,10 @@ jobs:
         with:
           version: 10
 
-      # Node 24 ships npm 11, which supports npm trusted publishing (OIDC).
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
           cache: 'pnpm'
-          registry-url: 'https://registry.npmjs.org'
 
       - name: Check that the tag matches package.json
         if: github.ref_type == 'tag'
@@ -42,6 +43,24 @@ jobs:
 
       - run: pnpm test
 
-      - run: pnpm publish --access public --no-git-checks --provenance
+      - run: pnpm build
+
+      # `pnpm pack` applies publishConfig, so the packed package.json points at dist/.
+      - name: Pack
+        run: pnpm pack --pack-destination release
+
+      # On a tag run, the packed version must equal the tag (v0.3.0 -> 0.3.0).
+      # A manual run from a branch publishes the version in package.json.
+      - name: Dry run
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          TAG: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
+        run: node scripts/publish.mjs --dry-run ${TAG:+--expect-version "${TAG#v}"} release
+
+      # Publishes with a raw authenticated PUT (see scripts/publish.mjs). `npm publish` fails on
+      # this account: its 2FA is security-key-only, which collides with the CLI's OTP flow.
+      # NPM_TOKEN is a granular token with "bypass 2FA". A version already on npm is skipped.
+      - name: Publish
+        env:
+          TAG: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: node scripts/publish.mjs ${TAG:+--expect-version "${TAG#v}"} release

@@ -27,7 +27,7 @@ If you called this endpoint without a signed-in user, or relied on it to bypass 
 
 - Added vitest tests for the delete endpoint, the plugin config, and the hydration guard (`pnpm test`).
 - Added `pnpm typecheck`.
-- The publish workflow runs typecheck and tests before it publishes. It checks that the tag matches `package.json`, and it uses Node 24.
+- The publish workflow runs typecheck and tests before it publishes, and checks that the tag matches `package.json`. It packs with pnpm and publishes with a raw authenticated PUT (`scripts/publish.mjs`), like the other plugins. It skips a version that is already on npm.
 
 ## 0.1.1
 
