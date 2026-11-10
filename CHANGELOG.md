@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.1
+
+### Fix
+
+- The gallery list view no longer renders a second bulk upload drawer. Payload's `BulkUploadProvider` already renders one.
+
 ## 0.3.0
 
 This release is for Payload 3. The `0.2.0-next.*` prereleases on the npm `next` tag are a separate Payload 4 beta line. This release skips 0.2.0, so a `^0.2.0-next.1` range does not resolve to this Payload 3 build.
