@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import {
-  BulkUploadDrawer,
   BulkUploadProvider,
   toast,
   useBulkUpload,
@@ -160,7 +159,6 @@ function MediaGalleryInner({ collectionSlug }: ListViewClientProps) {
         />
       )}
 
-      {!isInDrawer && <BulkUploadDrawer />}
     </div>
   )
 }
