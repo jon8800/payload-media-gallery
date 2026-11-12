@@ -1,8 +1,7 @@
 'use client'
 
 import React, { useCallback, useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Modal, toast, useConfig, useListQuery, useModal } from '@payloadcms/ui'
+import { Modal, toast, useConfig, useListQuery, useModal, useRouter } from '@payloadcms/ui'
 
 import {
   formatBytes,
@@ -53,7 +52,7 @@ function MediaLightboxComponent({
     setPendingNav(null)
   }, [docs, pendingNav, setLightboxIndex])
 
-  const handleDelete = useCallback(async (docId: number) => {
+  const handleDelete = useCallback(async (docId: number | string) => {
     setDeleting(true)
     try {
       const res = await fetch(`${serverURL}${apiRoute}/media-gallery/delete`, {
@@ -238,7 +237,7 @@ function MediaLightboxComponent({
             )}
           </dl>
 
-          {isImage(activeDoc.mimeType) && activeDoc.sizes && (
+          {isImage(activeDoc.mimeType) && activeDoc.variants && (
             <div className="media-lightbox__sizes">
               <button
                 type="button"
@@ -266,7 +265,7 @@ function MediaLightboxComponent({
                       </span>
                     </a>
                   )}
-                  {Object.entries(activeDoc.sizes).map(([name, size]) => {
+                  {Object.entries(activeDoc.variants).map(([name, size]) => {
                     if (!size?.url) return null
                     return (
                       <a key={name} href={size.url} target="_blank" rel="noopener noreferrer" className="media-lightbox__size-item">

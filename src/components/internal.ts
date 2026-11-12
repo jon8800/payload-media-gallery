@@ -8,7 +8,8 @@ export interface SizeEntry {
 }
 
 export interface MediaDoc {
-  id: number
+  /** A number on SQL adapters, a string on MongoDB. */
+  id: number | string
   alt?: string
   filename?: string
   mimeType?: string
@@ -19,7 +20,8 @@ export interface MediaDoc {
   height?: number
   createdAt?: string
   updatedAt?: string
-  sizes?: Record<string, SizeEntry | undefined>
+  /** Generated image sizes. Payload 4 renamed `sizes` to `variants`. */
+  variants?: Record<string, SizeEntry | undefined>
 }
 
 export function isImage(mimeType?: string | null): boolean {

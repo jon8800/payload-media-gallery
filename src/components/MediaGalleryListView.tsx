@@ -1,7 +1,13 @@
 'use client'
 
-import { DefaultListView, usePreferences } from '@payloadcms/ui'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import {
+  DefaultListView,
+  useListDrawerContext,
+  usePathname,
+  usePreferences,
+  useRouter,
+  useSearchParams,
+} from '@payloadcms/ui'
 import type { ListViewClientProps } from 'payload'
 import { useCallback, useEffect } from 'react'
 
@@ -25,12 +31,18 @@ export default function MediaGalleryListView({ initialMode = 'grid', ...props }:
   const router = useRouter()
   const pathname = usePathname()
   const { setPreference } = usePreferences()
+  const { isInDrawer } = useListDrawerContext()
   const collectionSlug = props.collectionSlug
 
+  // Inside an upload picker the URL belongs to the page behind the drawer, so
+  // the drawer always shows the grid and has no toggle (like Payload's own
+  // layout toggle, which is hidden in drawers too).
   const hasViewParam = searchParams?.has(VIEW_PARAM) === true
-  const mode: Mode = hasViewParam
-    ? (searchParams.get(VIEW_PARAM) === 'list' ? 'list' : 'grid')
-    : initialMode
+  const mode: Mode = isInDrawer
+    ? 'grid'
+    : hasViewParam
+      ? (searchParams.get(VIEW_PARAM) === 'list' ? 'list' : 'grid')
+      : initialMode
   const isGrid = mode === 'grid'
 
   const setMode = useCallback((next: Mode) => {
@@ -54,21 +66,33 @@ export default function MediaGalleryListView({ initialMode = 'grid', ...props }:
   }, [searchParams, router, pathname, setPreference, collectionSlug])
 
   useEffect(() => {
+    if (isInDrawer) return
     document.body.classList.toggle('media-gallery-grid-mode', isGrid)
     return () => document.body.classList.remove('media-gallery-grid-mode')
-  }, [isGrid])
+  }, [isGrid, isInDrawer])
+
+  // Marks a page that shows the gallery list view. The CSS uses it to hide
+  // Payload's own layout toggle, which the gallery's toggle replaces.
+  useEffect(() => {
+    if (isInDrawer) return
+    document.body.classList.add('media-gallery-view')
+    return () => document.body.classList.remove('media-gallery-view')
+  }, [isInDrawer])
 
   return (
     <DefaultListView
       {...props}
-      beforeActions={[
-        <ViewModeToggle
-          key="media-gallery-view-mode-toggle"
-          mode={mode}
-          onChange={setMode}
-        />,
-        ...(props.beforeActions ?? []),
-      ]}
+      // Payload 4 has its own document grid. The gallery replaces it, so Payload
+      // always renders the `Table` slot and the gallery decides what goes in it.
+      documentLayout="table"
+      beforeActions={
+        isInDrawer
+          ? props.beforeActions
+          : [
+              <ViewModeToggle key="media-gallery-view-mode-toggle" mode={mode} onChange={setMode} />,
+              ...(props.beforeActions ?? []),
+            ]
+      }
       Table={isGrid ? <MediaGalleryView {...props} /> : props.Table}
     />
   )

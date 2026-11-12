@@ -1,10 +1,10 @@
 import { mongooseAdapter } from '@payloadcms/db-mongodb'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import { sharpTransformer } from '@payloadcms/transformer-sharp'
 import { MongoMemoryReplSet } from 'mongodb-memory-server'
 import path from 'path'
 import { buildConfig } from 'payload'
 import { mediaGalleryPlugin } from 'payload-media-gallery'
-import sharp from 'sharp'
 import { fileURLToPath } from 'url'
 
 import { testEmailAdapter } from './helpers/testEmailAdapter.js'
@@ -52,27 +52,17 @@ const buildConfigWithMemoryDB = async () => {
         ],
         upload: {
           staticDir: path.resolve(dirname, 'media'),
-          imageSizes: [
-            {
-              name: 'thumbnail',
-              width: 400,
-              height: 300,
-              position: 'centre',
-            },
-            {
-              name: 'card',
-              width: 768,
-              height: 576,
-              position: 'centre',
-            },
-            {
-              name: 'tablet',
-              width: 1024,
-              height: undefined,
-              position: 'centre',
-            },
-          ],
         },
+      },
+      {
+        // Opens the gallery inside upload pickers (single and hasMany).
+        slug: 'posts',
+        admin: { useAsTitle: 'title' },
+        fields: [
+          { name: 'title', type: 'text' },
+          { name: 'image', type: 'upload', relationTo: 'media' },
+          { name: 'gallery', type: 'upload', relationTo: 'media', hasMany: true },
+        ],
       },
     ],
     db: mongooseAdapter({
@@ -90,9 +80,40 @@ const buildConfigWithMemoryDB = async () => {
       }),
     ],
     secret: process.env.PAYLOAD_SECRET || 'test-secret_key',
-    sharp,
     typescript: {
       outputFile: path.resolve(dirname, 'payload-types.ts'),
+    },
+    // Payload 4: image resizing is an optional transformer, and image sizes are
+    // declared as `variants` on it.
+    upload: {
+      transformers: [
+        sharpTransformer({
+          collections: {
+            media: {
+              variants: [
+                {
+                  name: 'thumbnail',
+                  width: 400,
+                  height: 300,
+                  position: 'centre',
+                },
+                {
+                  name: 'card',
+                  width: 768,
+                  height: 576,
+                  position: 'centre',
+                },
+                {
+                  name: 'tablet',
+                  width: 1024,
+                  height: undefined,
+                  position: 'centre',
+                },
+              ],
+            },
+          },
+        }),
+      ],
     },
   })
 }

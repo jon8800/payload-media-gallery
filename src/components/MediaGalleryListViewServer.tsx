@@ -1,4 +1,4 @@
-import { cookies } from 'next/headers'
+import type { ServerAdapter } from 'payload'
 
 import MediaGalleryListView from './MediaGalleryListView.js'
 
@@ -7,7 +7,7 @@ import MediaGalleryListView from './MediaGalleryListView.js'
 // validators) that crash the RSC -> client boundary. Strip them before
 // passing through.
 //
-// Source of truth: @payloadcms/next/dist/views/List/index.js (renderListView,
+// Source of truth: @payloadcms/ui/dist/views/List/index.js (renderListView,
 // the `serverProps` const). If Payload adds a new server-only prop in a
 // future release, the dev warning below will flag it on first hit.
 const SERVER_PROP_KEYS = new Set([
@@ -21,6 +21,7 @@ const SERVER_PROP_KEYS = new Set([
   'payload',
   'permissions',
   'searchParams',
+  'server',
   'user',
 ])
 
@@ -28,6 +29,13 @@ const SERVER_PROP_KEYS = new Set([
 // keys). Unknown keys outside both sets get a dev-mode warning so we catch
 // Payload changes early rather than silently leaking.
 const KNOWN_CLIENT_PROP_KEYS = new Set([
+  'baseFilter',
+  'currentHierarchyItem',
+  'documentLayout',
+  'documentURLs',
+  'groupedData',
+  'hierarchyData',
+  'HierarchyIcon',
   'AfterList',
   'AfterListTable',
   'BeforeList',
@@ -66,18 +74,20 @@ function cookieName(collectionSlug: string): string {
 }
 
 export default async function MediaGalleryListViewServer(props: Record<string, unknown>) {
-  const { payload, user, collectionSlug } = props as {
+  const { payload, server, user, collectionSlug } = props as {
     payload?: { find: (args: unknown) => Promise<{ docs: Array<{ value?: unknown }> }> }
     user?: { id: string | number; collection: string }
     collectionSlug: string
+    server?: ServerAdapter
   }
 
   let initialMode: 'grid' | 'list' = 'grid'
 
   // 1. Cookie wins for sync persistence — written client-side on toggle, so it
   //    races-free against the next SSR pass on the same browser.
-  const cookieStore = await cookies()
-  const cookieValue = cookieStore.get(cookieName(collectionSlug))?.value
+  //    Payload 4 passes a framework-agnostic `server` adapter to admin views.
+  const cookieStore = await server?.getCookies()
+  const cookieValue = cookieStore?.get(cookieName(collectionSlug))?.value
   if (cookieValue === 'list') {
     initialMode = 'list'
   } else if (cookieValue !== 'grid' && payload && user) {
@@ -95,6 +105,10 @@ export default async function MediaGalleryListViewServer(props: Record<string, u
         },
         limit: 1,
         depth: 0,
+        // Payload 4 enforces access on the Local API by default. The query only
+        // reads the signed-in user's own preference, so run it as that user.
+        overrideAccess: false,
+        user,
       })
       if (result.docs?.[0]?.value === 'list') initialMode = 'list'
     } catch {
